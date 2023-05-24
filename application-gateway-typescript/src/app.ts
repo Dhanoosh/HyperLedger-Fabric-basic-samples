@@ -26,7 +26,6 @@ const certPath = envOrDefault('CERT_PATH', path.resolve(cryptoPath, 'users', 'Us
 
 // Path to peer tls certificate.
 const tlsCertPath = envOrDefault('TLS_CERT_PATH', path.resolve(cryptoPath, 'peers', 'peer0.org1.example.com', 'tls', 'ca.crt'));
-
 // Gateway peer endpoint.
 const peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:7051');
 
@@ -76,16 +75,18 @@ async function main(): Promise<void> {
         await getAllAssets(contract);
 
         // Create a new asset on the ledger.
-        await createAsset(contract);
+        //await createAsset(contract);
 
         // Update an existing asset asynchronously.
         await transferAssetAsync(contract);
 
+        await getAllAssets(contract);
+
         // Get the asset details by assetID.
-        await readAssetByID(contract);
+        //await readAssetByID(contract);
 
         // Update an asset which does not exist.
-        await updateNonExistentAsset(contract)
+        //await updateNonExistentAsset(contract)
     } finally {
         gateway.close();
         client.close();
@@ -146,34 +147,29 @@ async function getAllAssets(contract: Contract): Promise<void> {
 /**
  * Submit a transaction synchronously, blocking until it has been committed to the ledger.
  */
-async function createAsset(contract: Contract): Promise<void> {
-    console.log('\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments');
+// async function createAsset(contract: Contract): Promise<void> {
+//     console.log('\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments');
 
-    await contract.submitTransaction(
-        'CreateAsset',
-        assetId,
-        'yellow',
-        '5',
-        'Tom',
-        '1300',
-    );
+//     await contract.submitTransaction(
+        
+//     );
 
-    console.log('*** Transaction committed successfully');
-}
+//     console.log('*** Transaction committed successfully');
+// }
 
 /**
  * Submit transaction asynchronously, allowing the application to process the smart contract response (e.g. update a UI)
  * while waiting for the commit notification.
  */
 async function transferAssetAsync(contract: Contract): Promise<void> {
-    console.log('\n--> Async Submit Transaction: TransferAsset, updates existing asset owner');
+    console.log('\n--> Async Submit Transaction: TransferAsset, transfer amount from one owner to another owner');
 
     const commit = await contract.submitAsync('TransferAsset', {
-        arguments: [assetId, 'Saptha'],
+        arguments: ['001', '002', '10'],
     });
-    const oldOwner = utf8Decoder.decode(commit.getResult());
+    //const oldOwner = utf8Decoder.decode(commit.getResult());
 
-    console.log(`*** Successfully submitted transaction to transfer ownership from ${oldOwner} to Saptha`);
+    //console.log(`*** Successfully submitted transaction to transfer ownership from ${oldOwner} to Saptha`);
     console.log('*** Waiting for transaction commit');
 
     const status = await commit.getStatus();
@@ -197,23 +193,23 @@ async function readAssetByID(contract: Contract): Promise<void> {
 /**
  * submitTransaction() will throw an error containing details of any error responses from the smart contract.
  */
-async function updateNonExistentAsset(contract: Contract): Promise<void>{
-    console.log('\n--> Submit Transaction: UpdateAsset asset70, asset70 does not exist and should return an error');
+// async function updateNonExistentAsset(contract: Contract): Promise<void>{
+//     console.log('\n--> Submit Transaction: UpdateAsset asset70, asset70 does not exist and should return an error');
 
-    try {
-        await contract.submitTransaction(
-            'UpdateAsset',
-            'asset70',
-            'blue',
-            '5',
-            'Tomoko',
-            '300',
-        );
-        console.log('******** FAILED to return an error');
-    } catch (error) {
-        console.log('*** Successfully caught the error: \n', error);
-    }
-}
+//     try {
+//         await contract.submitTransaction(
+//             'UpdateAsset',
+//             'asset70',
+//             'blue',
+//             '5',
+//             'Tomoko',
+//             '300',
+//         );
+//         console.log('******** FAILED to return an error');
+//     } catch (error) {
+//         console.log('*** Successfully caught the error: \n', error);
+//     }
+// }
 
 /**
  * envOrDefault() will return the value of an environment variable, or a default value if the variable is undefined.
